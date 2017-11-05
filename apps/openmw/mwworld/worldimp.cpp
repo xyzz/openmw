@@ -2565,8 +2565,9 @@ namespace MWWorld
 
     void World::hurtStandingActors(const ConstPtr &object, float healthPerSecond)
     {
-        if (MWBase::Environment::get().getWindowManager()->isGuiMode())
-            return;
+        const bool noPause = !Settings::Manager::getBool("pause", "Game");
+        if (!noPause && MWBase::Environment::get().getWindowManager()->isGuiMode())
+           return;
 
         std::vector<MWWorld::Ptr> actors;
         mPhysics->getActorsStandingOn(object, actors);
@@ -2598,7 +2599,8 @@ namespace MWWorld
 
     void World::hurtCollidingActors(const ConstPtr &object, float healthPerSecond)
     {
-        if (MWBase::Environment::get().getWindowManager()->isGuiMode())
+        const bool noPause = !Settings::Manager::getBool("pause", "Game");
+        if (!noPause && MWBase::Environment::get().getWindowManager()->isGuiMode())
             return;
 
         std::vector<Ptr> actors;
