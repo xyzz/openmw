@@ -200,6 +200,7 @@ namespace Terrain
 
         // Assign a VBO here to enable state sharing between different Geometries.
         uvs->setVertexBufferObject(new osg::VertexBufferObject);
+        uvs->setBinding(osg::Array::BIND_PER_VERTEX);
 
         mUvBufferMap[numVerts] = uvs;
         return uvs;
