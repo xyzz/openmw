@@ -267,6 +267,8 @@ namespace MWRender
 
         mWorkItem = new CreateMapWorkItem(mWidth, mHeight, mMinX, mMinY, mMaxX, mMaxY, mCellSize, esmStore.get<ESM::Land>());
         mWorkQueue->addWorkItem(mWorkItem);
+        // This kinda makes the whole multithreaded map stuff pointless, but it gets read of race between savegame loading and map render
+        mWorkItem->waitTillDone();
     }
 
     void GlobalMap::worldPosToImageSpace(float x, float z, float& imageX, float& imageY)
