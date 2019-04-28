@@ -1,9 +1,13 @@
 int stderr = 0; // Hack: fix linker error
 
 #include "SDL_main.h"
+#include "engine.hpp"
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>
 #include <SDL_events.h>
+
+#include <osg/GraphicsContext>
+#include <osg/OperationThread>
 
 /*******************************************************************************
  Functions called by JNI
@@ -53,4 +57,39 @@ extern "C" int Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cl
     SDL_GameControllerAddMapping("5669727475616c000000000000000000,Virtual,a:b0,b:b1,back:b15,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b16,leftshoulder:b6,leftstick:b13,lefttrigger:a5,leftx:a0,lefty:a1,rightshoulder:b7,rightstick:b14,righttrigger:a4,rightx:a2,righty:a3,start:b11,x:b3,y:b4");
 
     return 0;
+}
+
+extern osg::ref_ptr<osgViewer::Viewer> g_viewer;
+static osg::GraphicsContext *ctx;
+
+class CtxReleaseOperation : public osg::Operation {
+public:
+    virtual void operator () (osg::Object* caller) {
+        ctx->releaseContext();
+    }
+};
+
+class CtxAcquireOperation : public osg::Operation {
+public:
+    virtual void operator () (osg::Object* caller) {
+        ctx->makeCurrent();
+    }
+};
+
+extern "C" void Java_org_libsdl_app_SDLActivity_omwSurfaceDestroyed(JNIEnv *env, jclass cls, jobject obj) {
+    if (!g_viewer)
+        return;
+
+    osg::ref_ptr<CtxReleaseOperation> op = new CtxReleaseOperation();
+    ctx = g_viewer->getCamera()->getGraphicsContext();
+    ctx->add(op);
+}
+
+extern "C" void Java_org_libsdl_app_SDLActivity_omwSurfaceRecreated(JNIEnv *env, jclass cls, jobject obj) {
+    if (!g_viewer)
+        return;
+
+    osg::ref_ptr<CtxAcquireOperation> op = new CtxAcquireOperation();
+    ctx = g_viewer->getCamera()->getGraphicsContext();
+    ctx->add(op);
 }

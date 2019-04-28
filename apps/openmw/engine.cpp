@@ -488,6 +488,9 @@ std::string OMW::Engine::loadSettings (Settings::Manager & settings)
     return settingspath;
 }
 
+// To share the viewer with Android interfaces
+osg::ref_ptr<osgViewer::Viewer> g_viewer;
+
 void OMW::Engine::createWindow(Settings::Manager& settings)
 {
     int screen = settings.getInt("screen", "Video");
@@ -605,6 +608,9 @@ void OMW::Engine::createWindow(Settings::Manager& settings)
     mViewer->realize();
 
     mViewer->getEventQueue()->getCurrentEventState()->setWindowRectangle(0, 0, graphicsWindow->getTraits()->width, graphicsWindow->getTraits()->height);
+
+    // To share the viewer with Android interfaces
+    g_viewer = mViewer;
 }
 
 void OMW::Engine::setWindowIcon()
@@ -949,6 +955,8 @@ void OMW::Engine::go()
 
         mEnvironment.limitFrameRate(frameTimer.time_s());
     }
+
+    g_viewer.release();
 
     // Save user settings
     settings.saveUser(settingspath);

@@ -13,6 +13,8 @@
 #   include <windows.h>
 #endif
 
+#include <osgViewer/Viewer>
+
 namespace Debug
 {
 #ifdef _WIN32
@@ -143,6 +145,8 @@ std::ostream& getRawStdout()
     return rawStdout ? *rawStdout : std::cout;
 }
 
+extern osg::ref_ptr<osgViewer::Viewer> g_viewer;
+
 int wrapApplication(int (*innerApplication)(int argc, char *argv[]), int argc, char *argv[], const std::string& appName)
 {
 #if defined _WIN32
@@ -201,6 +205,7 @@ int wrapApplication(int (*innerApplication)(int argc, char *argv[]), int argc, c
     }
     catch (const std::exception& e)
     {
+        g_viewer.release();
 #if (defined(__APPLE__) || defined(__linux) || defined(__unix) || defined(__posix))
         if (!isatty(fileno(stdin)))
 #endif
