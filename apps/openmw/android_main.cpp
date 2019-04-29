@@ -2,6 +2,8 @@ int stderr = 0; // Hack: fix linker error
 
 #include "SDL_main.h"
 #include "engine.hpp"
+#include "mwbase/inputmanager.hpp"
+#include "mwinput/inputmanagerimp.hpp"
 #include <SDL_gamecontroller.h>
 #include <SDL_mouse.h>
 #include <SDL_events.h>
@@ -83,6 +85,10 @@ extern "C" void Java_org_libsdl_app_SDLActivity_omwSurfaceDestroyed(JNIEnv *env,
     osg::ref_ptr<CtxReleaseOperation> op = new CtxReleaseOperation();
     ctx = g_viewer->getCamera()->getGraphicsContext();
     ctx->add(op);
+
+    auto inp = (MWInput::InputManager *)MWBase::Environment::get().getInputManager();
+    if (inp)
+        inp->windowVisibilityChange(false);
 }
 
 extern "C" void Java_org_libsdl_app_SDLActivity_omwSurfaceRecreated(JNIEnv *env, jclass cls, jobject obj) {
@@ -92,4 +98,8 @@ extern "C" void Java_org_libsdl_app_SDLActivity_omwSurfaceRecreated(JNIEnv *env,
     osg::ref_ptr<CtxAcquireOperation> op = new CtxAcquireOperation();
     ctx = g_viewer->getCamera()->getGraphicsContext();
     ctx->add(op);
+
+    auto inp = (MWInput::InputManager *)MWBase::Environment::get().getInputManager();
+    if (inp)
+        inp->windowVisibilityChange(true);
 }
