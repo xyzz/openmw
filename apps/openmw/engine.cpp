@@ -245,6 +245,22 @@ bool OMW::Engine::frame(float frametime)
             mEnvironment.getInputManager()->update(frametime, false);
         }
 
+        // Android(start)
+        bool pause_new = !mEnvironment.getInputManager()->isWindowVisible();
+        static bool pause_prev = pause_new; // n.b. this is only set once, not on every call to frame()
+
+        if (pause_prev != pause_new) {
+            if (pause_new) {
+                // if we went from unpaused=>paused, stop all sounds
+                mEnvironment.getSoundManager()->pauseSounds();
+            } else {
+                // if we went from paused=>unpaused, resume all sounds
+                mEnvironment.getSoundManager()->resumeSounds();
+            }
+        }
+        pause_prev = pause_new;
+        // Android(end)
+
         // When the window is minimized, pause the game. Currently this *has* to be here to work around a MyGUI bug.
         // If we are not currently rendering, then RenderItems will not be reused resulting in a memory leak upon changing widget textures (fixed in MyGUI 3.3.2),
         // and destroyed widgets will not be deleted (not fixed yet, https://github.com/MyGUI/mygui/issues/21)
