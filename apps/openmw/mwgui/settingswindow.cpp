@@ -17,6 +17,7 @@
 #include <components/misc/constants.hpp>
 #include <components/widgets/sharedstatebutton.hpp>
 #include <components/settings/settings.hpp>
+#include <components/files/configurationmanager.hpp>
 
 #include "../mwbase/environment.hpp"
 #include "../mwbase/world.hpp"
@@ -104,6 +105,8 @@ namespace
             max = MyGUI::utility::parseFloat(widget->getUserString(settingMax));
     }
 }
+
+extern Files::ConfigurationManager *g_cfgMgr;
 
 namespace MWGui
 {
@@ -285,6 +288,8 @@ namespace MWGui
 
     void SettingsWindow::onOkButtonClicked(MyGUI::Widget* _sender)
     {
+        const std::string settingspath = (g_cfgMgr->getUserConfigPath() / "settings.cfg").string();
+        Settings::Manager::saveUser(settingspath);
         MWBase::Environment::get().getWindowManager()->removeGuiMode(GM_Settings);
     }
 

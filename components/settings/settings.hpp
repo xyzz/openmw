@@ -32,7 +32,7 @@ namespace Settings
         void loadUser (const std::string& file);
         ///< load file as user settings
 
-        void saveUser (const std::string& file);
+        static void saveUser (const std::string& file);
         ///< save user settings to file
 
         static void resetPendingChange(const std::string &setting, const std::string &category);
